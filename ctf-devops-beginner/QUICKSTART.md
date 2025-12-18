@@ -49,7 +49,7 @@ Validate strings with `(`, `)`, and `*` where `*` can be:
 - `"()"` → Valid ✓
 - `"(*)"` → Valid ✓
 - `"(*))"` → Valid ✓
-- `"((**"` → Invalid ✗
+- `"(()"` → Invalid ✗
 
 ## Development Loop
 
