@@ -14,7 +14,7 @@ function App() {
   const [validationResults, setValidationResults] = useState(null);
   const [validationLoading, setValidationLoading] = useState(false);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  const API_URL = window.location.origin;
 
   // Fetch tasks on component mount
   useEffect(() => {

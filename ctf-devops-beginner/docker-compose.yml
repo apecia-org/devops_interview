@@ -1,38 +1,56 @@
 version: '3.8'
 
 services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"  # Only exposed port
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - app-network
+    depends_on:
+      - api
+      - frontend
+    restart: unless-stopped
+
   api:
     build:
-      context: ./api # build context folder
-      dockerfile: dockerfile # name of the dockerfile
+      context: ./api
+      dockerfile: Dockerfile
     container_name: task-api
-    ports:
-      - "3000:3000" # host port : container port
+    # Remove ports - only accessible through nginx
+    expose:
+      - "3000"
     environment:
       - NODE_ENV=development
-      - PORT=4000 # port the API listens on inside the container
+      - PORT=4000
       - JWT_SECRET=super-secret-key-2024
     networks:
-      - api-network # connect to the network defined below
+      - app-network
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
   frontend:
     build:
-      context: ./frontend # build context folder
-      dockerfile: dockerfile # name of the dockerfile
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: task-frontend
-    ports:
-      - "4000:4000" # host port : container port
+    # Remove ports - only accessible through nginx
+    expose:
+      - "4000"
     environment:
-      - REACT_APP_API_URL=http://localhost:4000 
+      - REACT_APP_API_URL=/api  # Use relative path now
     networks:
-      - app-network # connect to the network defined below
+      - app-network
     depends_on:
       - api
+    restart: unless-stopped
 
 networks:
   app-network:
